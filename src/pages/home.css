@@ -1,0 +1,10 @@
+.bodycontents {
+  margin: 10px;
+}
+
+.continue button {
+  height: 30px;
+  width: 100px;
+  background-color: #288cdd(202, 199, 199);
+  border: solid black 2px;
+}
