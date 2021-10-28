@@ -1,24 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import Login from "./Pages/Login";
+import QuestionsList from "./Pages/QuestionsList";
+import Question from "./Pages/Question";
+import ProtectedRoute from "./RoutesConfig/ProtectedRoute";
+import { ProtectedLogin } from "./RoutesConfig/ProtectedLogin";
+
+import { BrowserRouter as Router, Switch, Redirect } from "react-router-dom";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        <ProtectedLogin exact path="/" component={Login} />
+        <ProtectedRoute path="/test" component={Login} />
+        <ProtectedRoute path="/questions" component={QuestionsList} />
+        <ProtectedRoute path="/question" component={Question} />
+        <Redirect
+          to={{
+            pathname: "/",
+          }}
+        />
+      </Switch>
+    </Router>
   );
 }
 
