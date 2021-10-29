@@ -6,6 +6,7 @@ import { useHistory } from "react-router";
 export default function QuestionsList() {
   const [Questions, setQuestions] = useState([]);
   const [SelectedQuestion, setSelectedQuestion] = useState("");
+  const [SelectedQuestionObject, setSelectedQuestionObject] = useState({});
 
   const history = useHistory();
 
@@ -27,9 +28,15 @@ export default function QuestionsList() {
       });
   }, [Questions]);
 
-  const selectQuestion = (id) => {
-    if (SelectedQuestion === id) setSelectedQuestion("");
-    else setSelectedQuestion(id);
+  const selectQuestion = (questionID, question) => {
+    console.log(question);
+    if (SelectedQuestion === questionID) {
+      setSelectedQuestion("");
+      setSelectedQuestionObject("");
+    } else {
+      setSelectedQuestion(questionID);
+      setSelectedQuestionObject(question);
+    }
   };
 
   const nextButton = () => {
@@ -41,7 +48,7 @@ export default function QuestionsList() {
           onClick={() =>
             history.push({
               pathname: "/question",
-              state: { id: SelectedQuestion },
+              state: { question: SelectedQuestionObject },
             })
           }
         >
@@ -59,7 +66,7 @@ export default function QuestionsList() {
         }
         style={styles.card}
         onClick={() => {
-          selectQuestion(`question-${i}`);
+          selectQuestion(`question-${i}`, question);
         }}
         onMouseOver={() => {
           document.getElementById(`question-${i}`).style.backgroundColor =

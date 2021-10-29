@@ -1,6 +1,7 @@
 import background from "../Images/pattern.svg";
 import { useEffect, useState } from "react";
 import { Redirect, useHistory } from "react-router-dom";
+import axios from "axios";
 import "./Styles/style.css";
 import Timer from "../Components/Timer";
 
@@ -12,57 +13,52 @@ export default function Question(props) {
   const [SelectedQuestionID, setSelectedQuestionID] = useState("");
   const [SelectedLine, setSelectedLine] = useState("");
   const [SelectedLineNumber, setSelectedLineNumber] = useState("");
-  const [Score, setScore] = useState(500);
+  const [Score, setScore] = useState(0);
   const [Answer, setAnswer] = useState("");
   const [Answered, setAnswered] = useState([]);
   const [error, setError] = useState("");
 
   // eslint-disable-next-line
   const [Question, setQuestion] = useState({
-    title: "Store element in an array",
-    numberOfErrors: 3,
-    errorLines: [
-      "#include <stdio.h>",
-      "void main()",
-      "{",
-      "int array[10];",
-      "int i;",
-      'printf("\n\nRead and Print elements of anarray:\n");',
-      'printf("-----------------------------------------\n");',
-      'printf("Input 10 elements in the array :\n");',
-      "for(i=0; i<10; i--)",
-      "{",
-      'printf("element - %d :",i);',
-      'scanf("%d", &arr[0]);',
-      "}",
-    ],
-    lines: [
-      "#include <stdio.h>",
-      "void main()",
-      "{",
-      "int arr[10];",
-      "int i;",
-      'printf("\n\nRead and Print elements of anarray:\n");',
-      'printf("-----------------------------------------\n");',
-      'printf("Input 10 elements in the array :\n");',
-      "for(i=0; i<10; i++)",
-      "{",
-      'printf("element - %d :",i);',
-      'scanf("%d", &arr[i]);',
-      "}",
-    ],
-    timeLimit: 600,
+    title: "",
+    numberOfErrors: 0,
+    errorLines: [""],
+    lines: [""],
+    timeLimit: 0,
   });
 
   useEffect(() => {
-    if (typeof props.location.state != "undefined")
+    if (typeof props.location.state != "undefined") {
       setSelectedQuestionID(props.location.state.id);
+      console.log(props.location.state.question);
+      setQuestion(props.location.state.question);
+    }
   }, [props.location.state]);
 
   useEffect(() => {
-    time.setSeconds(time.getSeconds() + Question.timeLimit);
+    time.setSeconds(
+      time.getSeconds() + props.location.state.question.timeLimit
+    );
     // eslint-disable-next-line
-  }, [Question.timeLimit]);
+  }, [props.location.state.question.timeLimit]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    let config = {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    };
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/get-score`, config)
+      .then((res) => {
+        console.log("score", res.data);
+        setScore(res.data);
+      })
+      .catch((err) => {
+        console.log("error", err);
+      });
+  }, []);
 
   const selectLine = (id) => {
     if (SelectedLine === `line-${id}`) {
