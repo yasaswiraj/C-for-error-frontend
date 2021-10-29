@@ -196,12 +196,12 @@ export default function Question(props) {
                 <div style={{ fontSize: "1.5rem" }}>{Score}</div>
               </div>
               {
-                <div className="mt-4 w-100 d-flex flex-column justify-content-center align-items-center">
-                  <h4 className="text-dark">Number of errors</h4>
-                  <div style={{ fontSize: "1.5rem" }}>
-                    {Question.numberOfErrors}
-                  </div>
-                </div>
+                // <div className="mt-4 w-100 d-flex flex-column justify-content-center align-items-center">
+                //   <h4 className="text-dark">Number of errors</h4>
+                //   <div style={{ fontSize: "1.5rem" }}>
+                //     {Question.numberOfErrors}
+                //   </div>
+                // </div>
               }
               <div className="mt-4 w-100 d-flex flex-column justify-content-center align-items-center">
                 <h4 className="text-dark">Error solved</h4>

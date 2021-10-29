@@ -1,28 +1,31 @@
 import background from "../Images/pattern.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import "./Styles/style.css";
 import { useHistory } from "react-router";
 export default function QuestionsList() {
-  const questions = [
-    "4efdec03",
-    "c8cdadc7",
-    "c3bb9e2e",
-    "36b53662",
-    "87be59d5",
-    "3157fe0c",
-    "0b62340b",
-    "0b62340b",
-    "c8cdadc7",
-    "c3bb9e2e",
-    "36b53662",
-    "87be59d5",
-    "3157fe0c",
-    "0b62340b",
-    "0b62340b",
-  ];
+  const [Questions, setQuestions] = useState([]);
   const [SelectedQuestion, setSelectedQuestion] = useState("");
 
   const history = useHistory();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    let config = {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    };
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/questions`, config)
+      .then((res) => {
+        console.log(res.data);
+        setQuestions(res.data);
+      })
+      .catch((err) => {
+        console.log("error", err);
+      });
+  }, [Questions]);
 
   const selectQuestion = (id) => {
     if (SelectedQuestion === id) setSelectedQuestion("");
@@ -47,7 +50,7 @@ export default function QuestionsList() {
       );
   };
 
-  const questionsList = questions.map((question, i) => {
+  const questionsList = Questions.map((question, i) => {
     return (
       <div
         id={`question-${i}`}
@@ -69,7 +72,8 @@ export default function QuestionsList() {
           document.getElementById(`question-${i}`).style.color = "#B61919";
         }}
       >
-        Question {question.toUpperCase()}
+        Question{" "}
+        {question._id.substring(question._id.length - 4, question._id.length)}
       </div>
     );
   });

@@ -16,7 +16,7 @@ export function NavigationBar() {
       fixed="top"
     >
       <Container>
-        <Navbar.Brand>
+        <Navbar.Brand href="/">
           <img className="mx-5" src={logo} alt="" width="40" height="40" />
           <img src={CSlogo} alt="" width="auto" height="40" />
         </Navbar.Brand>
