@@ -17,8 +17,8 @@ export function NavigationBar() {
     >
       <Container>
         <Navbar.Brand>
-          <img src={logo} alt="" width="40" height="40" />
-          <img className="mx-5" src={CSlogo} alt="" width="auto" height="40" />
+          <img className="mx-5" src={logo} alt="" width="40" height="40" />
+          <img src={CSlogo} alt="" width="auto" height="40" />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">

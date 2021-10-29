@@ -58,13 +58,14 @@ export default function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <div
+          <input
             className="btn mt-3 d-flex align-items-center justify-content-center font-weight-bold"
             style={styles.loginButton}
             onClick={handleLogin}
-          >
-            Login
-          </div>
+            type="submit"
+            value="Login"
+          />
+
           <div className="mt-2 text-danger">
             <center>{error}</center>
           </div>

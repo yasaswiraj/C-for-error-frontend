@@ -1,55 +1,80 @@
 import background from "../Images/pattern.svg";
 import { useEffect, useState } from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 import "./Styles/style.css";
 import Timer from "../Components/Timer";
 
 export default function Question(props) {
   const time = new Date();
-  time.setSeconds(time.getSeconds() + 6);
+  const history = useHistory();
+
   // eslint-disable-next-line
   const [SelectedQuestionID, setSelectedQuestionID] = useState("");
   const [SelectedLine, setSelectedLine] = useState("");
+  const [SelectedLineNumber, setSelectedLineNumber] = useState("");
+  const [Score, setScore] = useState(500);
   const [Answer, setAnswer] = useState("");
+  const [Answered, setAnswered] = useState([]);
+  const [error, setError] = useState("");
+
   // eslint-disable-next-line
   const [Question, setQuestion] = useState({
     title: "Store element in an array",
-    lines: [
-      "#include <stdio.h> ",
+    numberOfErrors: 3,
+    errorLines: [
+      "#include <stdio.h>",
       "void main()",
       "{",
       "int array[10];",
       "int i;",
-      "printf('\n\nRead and Print elements of anarray:\n');",
-      "printf('-----------------------------------------\n');",
-      "printf('Input 10 elements in the array :\n');",
+      'printf("\n\nRead and Print elements of anarray:\n");',
+      'printf("-----------------------------------------\n");',
+      'printf("Input 10 elements in the array :\n");',
       "for(i=0; i<10; i--)",
       "{",
-      " printf('element - %d :',i);",
-      'scanf("%d", &arr[0]);',
-      "}",
-      "#include <stdio.h> ",
-      "void main()",
-      "{",
-      "int array[10];",
-      "int i;",
-      "printf('\n\nRead and Print elements of anarray:\n');",
-      "printf('-----------------------------------------\n');",
-      "printf('Input 10 elements in the array :\n');",
-      "for(i=0; i<10; i--)",
-      "{",
-      " printf('element - %d :',i);",
+      'printf("element - %d :",i);',
       'scanf("%d", &arr[0]);',
       "}",
     ],
+    lines: [
+      "#include <stdio.h>",
+      "void main()",
+      "{",
+      "int arr[10];",
+      "int i;",
+      'printf("\n\nRead and Print elements of anarray:\n");',
+      'printf("-----------------------------------------\n");',
+      'printf("Input 10 elements in the array :\n");',
+      "for(i=0; i<10; i++)",
+      "{",
+      'printf("element - %d :",i);',
+      'scanf("%d", &arr[i]);',
+      "}",
+    ],
+    timeLimit: 600,
   });
 
+  useEffect(() => {
+    if (typeof props.location.state != "undefined")
+      setSelectedQuestionID(props.location.state.id);
+  }, [props.location.state]);
+
+  useEffect(() => {
+    time.setSeconds(time.getSeconds() + Question.timeLimit);
+    // eslint-disable-next-line
+  }, [Question.timeLimit]);
+
   const selectLine = (id) => {
-    if (SelectedLine === id) setSelectedLine("");
-    else setSelectedLine(id);
+    if (SelectedLine === `line-${id}`) {
+      setSelectedLine("");
+      setSelectedLineNumber("");
+    } else {
+      setSelectedLine(`line-${id}`);
+      setSelectedLineNumber(id);
+    }
   };
 
-  const LinesList = Question.lines.map((line, i) => {
+  const LinesList = Question.errorLines.map((line, i) => {
     return (
       <div style={{ marginBottom: "0.2rem", display: "flex" }}>
         <div style={{ width: "1.5rem" }}>{i + 1}.</div>
@@ -60,7 +85,7 @@ export default function Question(props) {
           }
           style={styles.line}
           onClick={() => {
-            selectLine(`line-${i}`);
+            selectLine(i);
           }}
           onMouseOver={() => {
             document.getElementById(`line-${i}`).style.backgroundColor =
@@ -79,11 +104,6 @@ export default function Question(props) {
     );
   });
 
-  useEffect(() => {
-    if (typeof props.location.state != "undefined")
-      setSelectedQuestionID(props.location.state.id);
-  }, [props.location.state]);
-
   const goBack = () => {
     if (typeof props.location.state == "undefined")
       return (
@@ -96,6 +116,35 @@ export default function Question(props) {
           }}
         />
       );
+  };
+
+  const submitAnswer = (e) => {
+    if (Answer === "") setError("Answer cannot be empty");
+    else if (SelectedLine === "") setError("Select a line");
+    else {
+      setError("");
+      if (
+        Question.lines[SelectedLineNumber] ===
+        Question.errorLines[SelectedLineNumber]
+      )
+        setScore(Score - 10);
+      else if (
+        Question.lines[SelectedLineNumber] === Answer &&
+        !Answered.includes(SelectedLineNumber)
+      ) {
+        setScore(Score + 20);
+        setAnswered([...Answered, SelectedLineNumber]);
+        if (Question.numberOfErrors === Answered.length + 1)
+          history.push("/questions");
+      } else {
+        if (
+          Question.lines[SelectedLineNumber] !== Answer &&
+          !Answered.includes(SelectedLineNumber)
+        ) {
+          setScore(Score - 10);
+        }
+      }
+    }
   };
 
   return (
@@ -128,16 +177,35 @@ export default function Question(props) {
                     <div
                       className="col-md-4  btn d-flex align-items-center justify-content-center font-weight-bold"
                       style={styles.submitButton}
+                      onClick={submitAnswer}
                     >
                       Submit
                     </div>
                   </div>
+                  <div className="text-danger">{error}</div>
                 </div>
               </div>
             </div>
             <div className="col-md-4 border border-secondary border-1 border-end-0 border-top-0 border-bottom-0">
-              <div className="w-100 d-flex justify-content-center align-items-center">
+              <div className="w-100 d-flex flex-column justify-content-center align-items-center">
+                <h4 className="text-dark">Time</h4>
                 <Timer expiryTimestamp={time} />
+              </div>
+              <div className="mt-4 w-100 d-flex flex-column justify-content-center align-items-center">
+                <h4 className="text-dark">Score</h4>
+                <div style={{ fontSize: "1.5rem" }}>{Score}</div>
+              </div>
+              {
+                <div className="mt-4 w-100 d-flex flex-column justify-content-center align-items-center">
+                  <h4 className="text-dark">Number of errors</h4>
+                  <div style={{ fontSize: "1.5rem" }}>
+                    {Question.numberOfErrors}
+                  </div>
+                </div>
+              }
+              <div className="mt-4 w-100 d-flex flex-column justify-content-center align-items-center">
+                <h4 className="text-dark">Error solved</h4>
+                <div style={{ fontSize: "1.5rem" }}>{Answered.length}</div>
               </div>
             </div>
           </div>
@@ -154,7 +222,7 @@ const styles = {
     backgroundPosition: "center",
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",
-    paddingTop: "6rem",
+    padding: "6rem 0",
   },
   card: {
     backgroundColor: "white",

@@ -12,6 +12,13 @@ export default function QuestionsList() {
     "3157fe0c",
     "0b62340b",
     "0b62340b",
+    "c8cdadc7",
+    "c3bb9e2e",
+    "36b53662",
+    "87be59d5",
+    "3157fe0c",
+    "0b62340b",
+    "0b62340b",
   ];
   const [SelectedQuestion, setSelectedQuestion] = useState("");
 
@@ -70,7 +77,7 @@ export default function QuestionsList() {
   return (
     <>
       <div
-        className="d-flex flex-column vh-100 align-items-center justify-content-center"
+        className="d-flex flex-column min-vh-100 align-items-center justify-content-center"
         style={styles.background}
       >
         {questionsList}
@@ -87,6 +94,7 @@ const styles = {
     backgroundPosition: "center",
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",
+    paddingTop: "5rem",
   },
   card: {
     backgroundColor: "transparent",
@@ -108,8 +116,10 @@ const styles = {
     backgroundColor: "#FF6B6B",
     borderRadius: 25,
     padding: "0.75rem 5rem",
-    boxShadow: "2px 2px 4px rgb(0,0,0,0.2)",
+    boxShadow: "2px 2px 25px rgb(0,0,0,0.2)",
     marginBottom: "0.75rem",
     color: "white",
+    position: "fixed",
+    bottom: 0,
   },
 };

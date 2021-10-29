@@ -9,7 +9,7 @@ export default function Timer({ expiryTimestamp }) {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <div style={{ fontSize: "2rem" }}>
+      <div style={{ fontSize: "1.5rem" }}>
         <span>{timer.minutes}</span>:<span>{timer.seconds}</span>
       </div>
     </div>
