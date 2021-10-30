@@ -6,9 +6,8 @@ import "./Styles/style.css";
 import Timer from "../Components/Timer";
 
 export default function Question(props) {
-  const time = new Date();
   const history = useHistory();
-
+  const [time, setTime] = useState(new Date());
   // eslint-disable-next-line
   const [SelectedQuestionID, setSelectedQuestionID] = useState("");
   const [SelectedLine, setSelectedLine] = useState("");
@@ -30,17 +29,18 @@ export default function Question(props) {
   useEffect(() => {
     if (typeof props.location.state != "undefined") {
       setSelectedQuestionID(props.location.state.id);
-      console.log(props.location.state.question);
       setQuestion(props.location.state.question);
+
+      var temp = time;
+      console.log(new Date(props.location.state.date));
+      temp = new Date(props.location.state.date);
+      temp.setSeconds(
+        new Date(props.location.state.date).getSeconds() +
+          props.location.state.question.timeLimit
+      );
+      setTime(temp);
     }
   }, [props.location.state]);
-
-  useEffect(() => {
-    time.setSeconds(
-      time.getSeconds() + props.location.state.question.timeLimit
-    );
-    // eslint-disable-next-line
-  }, [props.location.state.question.timeLimit]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -58,7 +58,7 @@ export default function Question(props) {
       .catch((err) => {
         console.log("error", err);
       });
-  }, []);
+  }, [Question._id]);
 
   const selectLine = (id) => {
     if (SelectedLine === `line-${id}`) {
@@ -68,6 +68,41 @@ export default function Question(props) {
       setSelectedLine(`line-${id}`);
       setSelectedLineNumber(id);
     }
+  };
+
+  const Time = () => {
+    var temp = new Date();
+    if (typeof props.location.state != "undefined") {
+      console.log(new Date(props.location.state.date));
+      temp = new Date(props.location.state.date);
+      temp.setSeconds(
+        new Date(props.location.state.date).getSeconds() +
+          props.location.state.question.timeLimit
+      );
+    }
+    console.log(temp);
+    const token = localStorage.getItem("token");
+    let config = {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    };
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/add-solved`,
+        {
+          questionID: Question._id,
+          date: time,
+        },
+        config
+      )
+      .then((res) => {
+        console.log("score", res.data);
+      })
+      .catch((err) => {
+        console.log("error", err);
+      });
+    return <Timer expiryTimestamp={temp} />;
   };
 
   const LinesList = Question.errorLines.map((line, i) => {
@@ -142,73 +177,73 @@ export default function Question(props) {
       }
     }
   };
-
-  return (
-    <>
-      {goBack()}
-      <div
-        className="d-flex min-vh-100 flex-column align-items-center justify-content-start"
-        style={styles.background}
-      >
-        <div className="container p-3 mb-5 w-75" style={styles.card}>
-          <div className="row">
-            <div className="col-md-8">
-              <h3 className="mb-3" style={{ color: "#B61919", fontSize: 35 }}>
-                {Question.title}
-              </h3>
-              {LinesList}
-              <div className="mt-3 container p-0">
-                <div className="row">
-                  <div className="col-md-8">
-                    <input
-                      style={styles.input}
-                      placeholder="Answer"
-                      value={Answer}
-                      onChange={(e) => {
-                        setAnswer(e.target.value);
-                      }}
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <div
-                      className="col-md-4  btn d-flex align-items-center justify-content-center font-weight-bold"
-                      style={styles.submitButton}
-                      onClick={submitAnswer}
-                    >
-                      Submit
+  if (typeof props.location.state != "undefined")
+    return (
+      <>
+        {goBack()}
+        <div
+          className="d-flex min-vh-100 flex-column align-items-center justify-content-start"
+          style={styles.background}
+        >
+          <div className="container p-3 mb-5 w-75" style={styles.card}>
+            <div className="row">
+              <div className="col-md-8">
+                <h3 className="mb-3" style={{ color: "#B61919", fontSize: 35 }}>
+                  {Question.title}
+                </h3>
+                {LinesList}
+                <div className="mt-3 container p-0">
+                  <div className="row">
+                    <div className="col-md-8">
+                      <input
+                        style={styles.input}
+                        placeholder="Answer"
+                        value={Answer}
+                        onChange={(e) => {
+                          setAnswer(e.target.value);
+                        }}
+                      />
                     </div>
+                    <div className="col-md-4">
+                      <div
+                        className="col-md-4  btn d-flex align-items-center justify-content-center font-weight-bold"
+                        style={styles.submitButton}
+                        onClick={submitAnswer}
+                      >
+                        Submit
+                      </div>
+                    </div>
+                    <div className="text-danger">{error}</div>
                   </div>
-                  <div className="text-danger">{error}</div>
                 </div>
               </div>
-            </div>
-            <div className="col-md-4 border border-secondary border-1 border-end-0 border-top-0 border-bottom-0">
-              <div className="w-100 d-flex flex-column justify-content-center align-items-center">
-                <h4 className="text-dark">Time</h4>
-                <Timer expiryTimestamp={time} />
-              </div>
-              <div className="mt-4 w-100 d-flex flex-column justify-content-center align-items-center">
-                <h4 className="text-dark">Score</h4>
-                <div style={{ fontSize: "1.5rem" }}>{Score}</div>
-              </div>
-              {
-                // <div className="mt-4 w-100 d-flex flex-column justify-content-center align-items-center">
-                //   <h4 className="text-dark">Number of errors</h4>
-                //   <div style={{ fontSize: "1.5rem" }}>
-                //     {Question.numberOfErrors}
-                //   </div>
-                // </div>
-              }
-              <div className="mt-4 w-100 d-flex flex-column justify-content-center align-items-center">
-                <h4 className="text-dark">Error solved</h4>
-                <div style={{ fontSize: "1.5rem" }}>{Answered.length}</div>
+              <div className="col-md-4 border border-secondary border-1 border-end-0 border-top-0 border-bottom-0">
+                <div className="w-100 d-flex flex-column justify-content-center align-items-center">
+                  <h4 className="text-dark">Time</h4>
+                  {Time()}
+                </div>
+                <div className="mt-4 w-100 d-flex flex-column justify-content-center align-items-center">
+                  <h4 className="text-dark">Score</h4>
+                  <div style={{ fontSize: "1.5rem" }}>{Score}</div>
+                </div>
+                {
+                  // <div className="mt-4 w-100 d-flex flex-column justify-content-center align-items-center">
+                  //   <h4 className="text-dark">Number of errors</h4>
+                  //   <div style={{ fontSize: "1.5rem" }}>
+                  //     {Question.numberOfErrors}
+                  //   </div>
+                  // </div>
+                }
+                <div className="mt-4 w-100 d-flex flex-column justify-content-center align-items-center">
+                  <h4 className="text-dark">Error solved</h4>
+                  <div style={{ fontSize: "1.5rem" }}>{Answered.length}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
 }
 
 const styles = {

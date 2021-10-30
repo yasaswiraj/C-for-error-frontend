@@ -5,6 +5,7 @@ import "./Styles/style.css";
 import { useHistory } from "react-router";
 export default function QuestionsList() {
   const [Questions, setQuestions] = useState([]);
+  const [SolvedQuestions, setSolvedQuestions] = useState({});
   const [SelectedQuestion, setSelectedQuestion] = useState("");
   const [SelectedQuestionObject, setSelectedQuestionObject] = useState({});
 
@@ -26,7 +27,7 @@ export default function QuestionsList() {
       .catch((err) => {
         console.log("error", err);
       });
-  }, [Questions]);
+  }, []);
 
   const selectQuestion = (questionID, question) => {
     console.log(question);
@@ -39,18 +40,41 @@ export default function QuestionsList() {
     }
   };
 
+  const sendQuestion = () => {
+    const token = localStorage.getItem("token");
+    let config = {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    };
+    console.log("SelectedQuestionObject", SelectedQuestionObject._id);
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/get-date`,
+        { questionID: SelectedQuestionObject._id },
+        config
+      )
+      .then((res) => {
+        history.push({
+          pathname: "/question",
+          state: {
+            question: SelectedQuestionObject,
+            date: res.data.date,
+          },
+        });
+      })
+      .catch((err) => {
+        console.log("error", err);
+      });
+  };
+
   const nextButton = () => {
     if (SelectedQuestion !== "")
       return (
         <div
           className="btn mt-3 d-flex align-items-center justify-content-center font-weight-bold fade-in-button"
           style={styles.loginButton}
-          onClick={() =>
-            history.push({
-              pathname: "/question",
-              state: { question: SelectedQuestionObject },
-            })
-          }
+          onClick={sendQuestion}
         >
           You sure? okay, lets go!
         </div>
