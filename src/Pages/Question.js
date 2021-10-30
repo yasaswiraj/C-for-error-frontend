@@ -102,7 +102,14 @@ export default function Question(props) {
       .catch((err) => {
         console.log("error", err);
       });
-    return <Timer expiryTimestamp={temp} />;
+    return (
+      <Timer
+        expiryTimestamp={temp}
+        id={Question._id}
+        score={Score}
+        history={history}
+      />
+    );
   };
 
   const LinesList = Question.errorLines.map((line, i) => {
@@ -165,8 +172,31 @@ export default function Question(props) {
       ) {
         setScore(Score + 20);
         setAnswered([...Answered, SelectedLineNumber]);
-        if (Question.numberOfErrors === Answered.length + 1)
-          history.push("/questions");
+        if (Question.numberOfErrors === Answered.length + 1) {
+          const token = localStorage.getItem("token");
+          let config = {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          };
+          console.log(Question._id);
+          axios
+            .post(
+              `${process.env.REACT_APP_API_URL}/set-score`,
+              {
+                questionID: Question._id.toString(),
+                score: Score,
+              },
+              config
+            )
+            .then((res) => {
+              console.log(res.data);
+              history.push("/questions");
+            })
+            .catch((err) => {
+              console.log("error", err);
+            });
+        }
       } else {
         if (
           Question.lines[SelectedLineNumber] !== Answer &&

@@ -59,6 +59,7 @@ export default function QuestionsList() {
           pathname: "/question",
           state: {
             question: SelectedQuestionObject,
+            id: SelectedQuestionObject._id,
             date: res.data.date,
           },
         });
