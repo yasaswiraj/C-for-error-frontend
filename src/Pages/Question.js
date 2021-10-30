@@ -4,6 +4,7 @@ import { Redirect, useHistory } from "react-router-dom";
 import axios from "axios";
 import "./Styles/style.css";
 import Timer from "../Components/Timer";
+import Loading from "../Components/Loading";
 
 export default function Question(props) {
   const history = useHistory();
@@ -16,6 +17,7 @@ export default function Question(props) {
   const [Answer, setAnswer] = useState("");
   const [Answered, setAnswered] = useState([]);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // eslint-disable-next-line
   const [Question, setQuestion] = useState({
@@ -108,6 +110,7 @@ export default function Question(props) {
         id={Question._id}
         score={Score}
         history={history}
+        setIsLoading={setIsLoading}
       />
     );
   };
@@ -180,6 +183,7 @@ export default function Question(props) {
             },
           };
           console.log(Question._id);
+          setIsLoading(true);
           axios
             .post(
               `${process.env.REACT_APP_API_URL}/set-score`,
@@ -190,10 +194,14 @@ export default function Question(props) {
               config
             )
             .then((res) => {
+              setIsLoading(false);
+
               console.log(res.data);
               history.push("/questions");
             })
             .catch((err) => {
+              setIsLoading(false);
+
               console.log("error", err);
             });
         }
@@ -215,6 +223,8 @@ export default function Question(props) {
           className="d-flex min-vh-100 flex-column align-items-center justify-content-start"
           style={styles.background}
         >
+          <Loading loading={isLoading} />
+
           <div className="container p-3 mb-5 w-75" style={styles.card}>
             <div className="row">
               <div className="col-md-8">

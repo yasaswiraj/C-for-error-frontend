@@ -2,12 +2,14 @@ import background from "../Images/pattern.svg";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./Styles/style.css";
+import Loading from "../Components/Loading";
 import { useHistory } from "react-router";
 export default function QuestionsList() {
   const [Questions, setQuestions] = useState([]);
   const [SolvedQuestions, setSolvedQuestions] = useState({});
   const [SelectedQuestion, setSelectedQuestion] = useState("");
   const [SelectedQuestionObject, setSelectedQuestionObject] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const history = useHistory();
 
@@ -48,6 +50,7 @@ export default function QuestionsList() {
       },
     };
     console.log("SelectedQuestionObject", SelectedQuestionObject._id);
+    setIsLoading(true);
     axios
       .post(
         `${process.env.REACT_APP_API_URL}/get-date`,
@@ -55,6 +58,7 @@ export default function QuestionsList() {
         config
       )
       .then((res) => {
+        setIsLoading(false);
         history.push({
           pathname: "/question",
           state: {
@@ -66,6 +70,7 @@ export default function QuestionsList() {
       })
       .catch((err) => {
         console.log("error", err);
+        setIsLoading(false);
       });
   };
 
@@ -116,6 +121,8 @@ export default function QuestionsList() {
         className="d-flex flex-column min-vh-100 align-items-center justify-content-center"
         style={styles.background}
       >
+        <Loading loading={isLoading} />
+
         {questionsList}
         {nextButton()}
       </div>

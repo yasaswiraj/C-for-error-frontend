@@ -1,10 +1,19 @@
 import { useTimer } from "react-timer-hook";
 import axios from "axios";
+import Loading from "../Components/Loading";
+import { useState } from "react";
 
-export default function Timer({ expiryTimestamp, id, score, history }) {
+export default function Timer({
+  expiryTimestamp,
+  id,
+  score,
+  history,
+  setIsLoading,
+}) {
   const timer = useTimer({
     expiryTimestamp,
     onExpire: () => {
+      setIsLoading(true);
       const token = localStorage.getItem("token");
       let config = {
         headers: {
@@ -21,10 +30,12 @@ export default function Timer({ expiryTimestamp, id, score, history }) {
           config
         )
         .then((res) => {
+          setIsLoading(false);
           console.log(res.data);
           history.push("/questions");
         })
         .catch((err) => {
+          setIsLoading(false);
           console.log("error", err);
         });
     },

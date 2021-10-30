@@ -2,16 +2,19 @@ import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import background from "../Images/Hexagon.svg";
 import axios from "axios";
+import Loading from "../Components/Loading";
 
 export default function Login() {
   let history = useHistory();
   const [roll, setRoll] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = () => {
     if (!roll || !password) setError("Fields shouldn't be empty");
-    else
+    else {
+      setIsLoading(true);
       axios
         .post(`${process.env.REACT_APP_API_URL}/login`, {
           roll_number: roll,
@@ -21,11 +24,14 @@ export default function Login() {
           localStorage.setItem("token", res.data);
           history.push("/round-1");
           setError("");
+          setIsLoading(false);
         })
         .catch(() => {
           console.log("error");
           setError("Invalid credentials");
+          setIsLoading(false);
         });
+    }
   };
 
   return (
@@ -33,6 +39,7 @@ export default function Login() {
       className="d-flex flex-column vh-100 align-items-center justify-content-center"
       style={styles.background}
     >
+      <Loading loading={isLoading} />
       <div style={styles.card}>
         <div
           className="font-weight-bold"
